@@ -9,11 +9,11 @@ gcc -o i3_phone i3_phone.c
 ```
 プログラムを実行する際は，サーバ側・クライアント側で入力すべきコマンドラインが異なる。サーバ側は，
 ```
-i3_phone <Port1> <Port2>
+./i3_phone <Port1> <Port2>
 ```
 のようにポート番号を2つ入力する。クライアント側は，
 ```
-i3_phone <IP address> <Port1> <Port2>
+./i3_phone <IP address> <Port1> <Port2>
 ```
 のように，サーバのIPアドレスおよびポート番号2つを入力する。
 

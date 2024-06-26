@@ -118,14 +118,11 @@ void* audio_thread(void *args) {
   int *mute_flag = audio_args->mute_flag;
 
   short data_rec[len], data_play[len];
+  short zeros[len];  // mute用に全て0が並んだ配列を用意しておく
+  for(int i=0; i<len; ++i) zeros[i] = 0;
 
   const int left_num = cutoff1 * len / sampling_freq;  // fft後のデータで0にしない左端の番号
   const int right_num = cutoff2 * len / sampling_freq;  // fft後のデータで0にしない右端の番号
-  //const int width = right_num - left_num + 1;
-
-  /* mute機能用にwidth分0.0+0.0jが並んだ配列を用意しておく */
-  //complex double zeros[width];
-  //for(int i=0; i<width; ++i) zeros[i] = 0.0;
 
   if(role == SERVER){
     while(1){
@@ -139,12 +136,23 @@ void* audio_thread(void *args) {
         exit(1);
       }
       if (num_data_read == 0) break;
-      if( send(s, data_rec, num_data_read * sizeof(short), 0) == -1 ){
-        perror("send");
-        free(X); free(Y);
-        pclose(REC); pclose(PLAY);
-        close(s);
-        exit(1);
+      if(*mute_flag){
+        if( send(s, zeros, len * sizeof(short), 0) == -1 ){
+          perror("send");
+          free(X); free(Y);
+          pclose(REC); pclose(PLAY);
+          close(s);
+          exit(1);
+        }
+      }
+      else{
+        if( send(s, data_rec, num_data_read * sizeof(short), 0) == -1 ){
+          perror("send");
+          free(X); free(Y);
+          pclose(REC); pclose(PLAY);
+          close(s);
+          exit(1);
+        }
       }
 
       // receive and bandpass and play
@@ -200,12 +208,23 @@ void* audio_thread(void *args) {
         exit(1);
       }
       if (num_data_read == 0) break;
-      if( send(s, data_rec, num_data_read * sizeof(short), 0) == -1 ){
-        perror("send");
-        free(X); free(Y);
-        pclose(REC); pclose(PLAY);
-        close(s);
-        exit(1);
+      if(*mute_flag){
+        if( send(s, zeros, len * sizeof(short), 0) == -1 ){
+          perror("send");
+          free(X); free(Y);
+          pclose(REC); pclose(PLAY);
+          close(s);
+          exit(1);
+        }
+      }
+      else{
+        if( send(s, data_rec, num_data_read * sizeof(short), 0) == -1 ){
+          perror("send");
+          free(X); free(Y);
+          pclose(REC); pclose(PLAY);
+          close(s);
+          exit(1);
+        }
       }
     }
   }
